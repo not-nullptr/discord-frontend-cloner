@@ -29,7 +29,8 @@ async function generateDiscordHtml(doc: JSDOM) {
 		fs.readFileSync("config.json").toString(),
 	) as GlobalEnv;
 	if (!validate(globalEnv, envReference)) {
-		return console.log("Invalid config! Are you missing a key?");
+		console.log("Invalid config! Are you missing a key?");
+		process.exit(1);
 	}
 	envScript.innerHTML = `window.GLOBAL_ENV = ${JSON.stringify(globalEnv)}`;
 	document

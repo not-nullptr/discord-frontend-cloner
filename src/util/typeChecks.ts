@@ -35,9 +35,11 @@ export function isOfChunkType(potentialChunks: Object) {
 
 export function validate(obj1: any, obj2: any) {
 	for (const key of Object.keys(obj1)) {
+		if (key === "$schema") continue;
 		if (!obj2[key]) return false;
 	}
 	for (const key of Object.keys(obj2)) {
+		if (key === "$schema") continue;
 		if (!obj1[key]) return false;
 	}
 	return true;

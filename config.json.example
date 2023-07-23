@@ -1,4 +1,5 @@
 {
+	"$schema": "./config.schema.json",
 	"API_ENDPOINT": "//discord.com/api",
 	"API_VERSION": 9,
 	"GATEWAY_ENDPOINT": "wss://gateway.discord.gg",
