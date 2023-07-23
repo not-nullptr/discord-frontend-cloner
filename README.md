@@ -1,7 +1,7 @@
 # Discord Frontend Cloner
 A piece of software which automatically creates a locally-hostable version of Discord's frontend.
 
-> **Warning**
+> **Warning**<br>
 Backend not included!
 
 # How to use
