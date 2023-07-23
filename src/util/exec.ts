@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 
 export function runNodeApp(path: string) {
 	return new Promise<number | null>((resolve) => {
-		const childProcess = spawn("node", [path]);
+		const childProcess = spawn("node", [path, process.env.PORT || "3000"]);
 
 		childProcess.stdout.on("data", (data) => {
 			console.log(data.toString());

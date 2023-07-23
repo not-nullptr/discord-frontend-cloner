@@ -12,7 +12,9 @@ import {
 } from "./util/search";
 import { validate } from "./util/typeChecks";
 import { runNodeApp } from "./util/exec";
-import { spawn } from "child_process";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 async function generateDiscordHtml(doc: JSDOM) {
 	const document = doc.window.document;
