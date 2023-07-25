@@ -54,6 +54,17 @@ This frontend cloner contains a somewhat intricate pattern find/replace system. 
 
 Typically, you'd use `"type": "loose"` for matching inside of a string, and `"type": "exact"` for matching a string containing _just_ the find pattern. The above causes a lot of changes across the platform, but some notable ones include:
 
+The title<br>
+![image](https://github.com/not-nullptr/discord-frontend-cloner/assets/62841684/a93c7095-9b86-43dc-a470-2e4bef7cfb3c)
+
+The "add friend" text<br>
+![image](https://github.com/not-nullptr/discord-frontend-cloner/assets/62841684/2d9991c9-16a0-4520-a6bc-404cc738125a)
+
+The Hypesquad page:
+![image](https://github.com/not-nullptr/discord-frontend-cloner/assets/62841684/95434934-0c92-4cab-bc97-b04678c79321)
+
+...and literally anywhere else the word "Discord" is used on the platform.
+
 # Why?
 
 Hosting a local instance of a given app has many uses; i.e. an intranet, bypassing censorship by running offline, confidentiality, etc.
