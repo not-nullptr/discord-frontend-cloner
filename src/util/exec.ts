@@ -1,8 +1,8 @@
 import { spawn } from "child_process";
 
-export function runNodeApp(path: string) {
+export function runNodeApp(path: string, port: number) {
 	return new Promise<number | null>((resolve) => {
-		const childProcess = spawn("node", [path, process.env.PORT || "3000"]);
+		const childProcess = spawn("node", [path, port.toString()]);
 
 		childProcess.stdout.on("data", (data) => {
 			console.log(data.toString());

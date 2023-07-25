@@ -1,6 +1,7 @@
 import fs from "fs";
 import https from "https";
 import { plaintext } from "./typeChecks";
+import { App } from "..";
 
 export function sleep(ms: number) {
 	return new Promise<void>((resolve) => {
@@ -8,11 +9,11 @@ export function sleep(ms: number) {
 	});
 }
 
-export function downloadBinaryAsset(path: string) {
+export function downloadBinaryAsset(path: string, app: App) {
 	let client = https;
 	return new Promise<void>((resolve, reject) => {
 		const req = client.get(`https://discord.com${path}`, (res) => {
-			res.pipe(fs.createWriteStream(`./discord${path}`))
+			res.pipe(fs.createWriteStream(`.${path}`))
 				.on("error", reject)
 				.once("close", () => resolve());
 		});
@@ -24,20 +25,24 @@ export function downloadBinaryAsset(path: string) {
 	});
 }
 
-export async function downloadPlaintextAsset(path: string) {
+export async function downloadPlaintextAsset(path: string, app: App) {
 	fs.writeFileSync(
-		`./discord${path}`,
+		`.${path}`,
 		await (await fetch(`https://discord.com${path}`)).text(),
 	);
 }
 
-export async function fetchLinks(links: string[], rateLimit: boolean = false) {
+export async function fetchLinks(
+	links: string[],
+	app: App,
+	rateLimit: boolean = false,
+) {
 	try {
 		for (const link of links) {
-			if (fs.existsSync(`./discord${link}`)) continue;
+			if (fs.existsSync(`./${link}`)) continue;
 			plaintext(link)
-				? await downloadPlaintextAsset(link)
-				: await downloadBinaryAsset(link);
+				? await downloadPlaintextAsset(link, app)
+				: await downloadBinaryAsset(link, app);
 			if (rateLimit) await sleep(150);
 			console.log(link);
 		}
@@ -48,6 +53,6 @@ export async function fetchLinks(links: string[], rateLimit: boolean = false) {
 			}). Don't worry, this is normal, you're probably ratelimited. Trying again in 5 seconds.`,
 		);
 		await sleep(5000);
-		await fetchLinks(links);
+		await fetchLinks(links, app);
 	}
 }

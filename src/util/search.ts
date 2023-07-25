@@ -1,17 +1,18 @@
 import fs from "fs";
 import { isMoreThan80PercentIdentical, isOfChunkType } from "./typeChecks";
 import { Config } from "../types/env";
+import { App } from "..";
 
-export function getChunksFromJsFiles() {
+export function getChunksFromJsFiles(app: App) {
 	let result: { [key: number]: string } | undefined;
 	if (fs.existsSync("potentialMatches.txt"))
 		fs.rmSync("potentialMatches.txt");
-	fs.readdirSync("discord/assets")
+	fs.readdirSync(`assets`)
 		.filter((f) => f.endsWith(".js"))
 		.forEach((f) => {
 			const matches =
 				fs
-					.readFileSync(`discord/assets/${f}`)
+					.readFileSync(`assets/${f}`)
 					.toString()
 					.match(/(?<=^|[^\w.])\{[^{}]*\}(?=[^\w.])/gm) || [];
 
@@ -36,14 +37,14 @@ export function getLinksFromChunks(chunks: { [key: number]: string }) {
 	return Object.values(chunks).map((chunk) => `/assets/${chunk}.js`);
 }
 
-export function getLinksFromCssFiles() {
+export function getLinksFromCssFiles(app: App) {
 	const result: string[] = [];
-	fs.readdirSync("discord/assets")
+	fs.readdirSync(`assets`)
 		.filter((f) => f.endsWith(".css"))
 		.forEach((f) => {
 			const matches =
 				fs
-					.readFileSync(`discord/assets/${f}`)
+					.readFileSync(`assets/${f}`)
 					.toString()
 					.match(/url\((.*?)\)/gi) || [];
 
@@ -55,14 +56,14 @@ export function getLinksFromCssFiles() {
 	return result;
 }
 
-export function getLinksFromGeneralSearch() {
+export function getLinksFromGeneralSearch(app: App) {
 	const result: string[] = [];
 	if (fs.existsSync("potentialMatches.txt"))
 		fs.rmSync("potentialMatches.txt");
-	fs.readdirSync("discord/assets")
+	fs.readdirSync(`assets`)
 		.filter((f) => f.endsWith(".js"))
 		.forEach((f) => {
-			const file = fs.readFileSync(`discord/assets/${f}`).toString();
+			const file = fs.readFileSync(`assets/${f}`).toString();
 			const regex =
 				/"([a-fA-F0-9]{32}\.(svg|png|mp4|mp3|webm|ico|woff2)")/gm;
 			const matches = file.match(regex) || [];
@@ -100,18 +101,18 @@ function replaceInQuotes(
 	return result;
 }
 
-export function performFindAndReplace(config: Config) {
-	const assets = fs.readdirSync("discord/assets");
+export function performFindAndReplace(config: Config, app: App) {
+	const assets = fs.readdirSync(`assets`);
 	assets
 		.filter((f) => f.endsWith(".serve"))
 		.forEach((f) => {
-			fs.rmSync(`discord/assets/${f}`);
+			fs.rmSync(`assets/${f}`);
 		});
 	assets
 		.filter((f) => f.endsWith(".js"))
 		.forEach((f) => {
 			let patternCount = 0;
-			const contents = fs.readFileSync(`discord/assets/${f}`).toString();
+			const contents = fs.readFileSync(`assets/${f}`).toString();
 			let newContents = contents;
 			config.patterns.forEach((p) => {
 				patternCount++;
@@ -126,8 +127,8 @@ export function performFindAndReplace(config: Config) {
 			console.log(
 				`${patternCount} pattern${
 					patternCount !== 1 ? "s" : ""
-				} found in ${f}! Writing to discord/assets/${f}.serve...`,
+				} found in ${f}! Writing to ${app.name}/assets/${f}.serve...`,
 			);
-			fs.writeFileSync(`discord/assets/${f}.serve`, newContents);
+			fs.writeFileSync(`assets/${f}.serve`, newContents);
 		});
 }

@@ -15,14 +15,33 @@ import { validate } from "./util/typeChecks";
 import { runNodeApp } from "./util/exec";
 import dotenv from "dotenv";
 
-dotenv.config();
+export interface App {
+	url: string;
+	name: string;
+	port: number;
+}
+
+const apps: App[] = [
+	{
+		url: "https://discord.com/login",
+		name: "discord",
+		port: 3000,
+	},
+	{
+		url: "https://discord.com/developers",
+		name: "devportal",
+		port: 3001,
+	},
+];
 
 const config = JSON.parse(fs.readFileSync("config.json").toString()) as Config;
 
-async function generateDiscordHtml(doc: JSDOM) {
+async function generateDiscordHtml(doc: JSDOM, app: App) {
 	const document = doc.window.document;
-	const envScript = document.querySelector("head")!.querySelector("script")!;
-	//    vvvv    we do this so this tool can constantly stay up-to-date with discord's shit
+	const envScript = Array.from(document.querySelectorAll("script")).find(
+		(s) => s.innerHTML.startsWith("window.GLOBAL_ENV ="),
+	); // we do this so this tool can constantly stay up-to-date with discord's shit
+	if (!envScript) throw new Error("GLOBAL_ENV not found!");
 	const envReference = eval(
 		`(${envScript.innerHTML
 			.replace("window.GLOBAL_ENV = ", "")
@@ -39,7 +58,7 @@ async function generateDiscordHtml(doc: JSDOM) {
 		.querySelectorAll("script")
 		.forEach((e) => e.removeAttribute("integrity"));
 	fs.writeFileSync(
-		"./discord/index.html",
+		`./${app.name}/index.html`,
 		await prettier.format(doc.serialize(), {
 			tabWidth: 2,
 			useTabs: true,
@@ -49,46 +68,47 @@ async function generateDiscordHtml(doc: JSDOM) {
 }
 
 (async () => {
-	if (!fs.existsSync("discord")) {
-		const git = simpleGit("");
-		await git.clone(
-			"https://github.com/not-nullptr/discord-selfhosting-guide",
-			"discord",
+	for (const app of apps) {
+		if (!fs.existsSync(app.name)) {
+			const git = simpleGit("");
+			await git.clone(
+				"https://github.com/not-nullptr/discord-selfhosting-guide",
+				app.name,
+			);
+		}
+		const doc = new JSDOM(await (await fetch(app.url)).text());
+		const document = doc.window.document;
+		await generateDiscordHtml(doc, app);
+		console.log(
+			`Generated Discord HTML based off config.json at ./${app.name}/index.html. The assets will be downloaded next.`,
 		);
+		if (!fs.existsSync(`assets`)) fs.mkdirSync(`assets`);
+		await sleep(2000);
+		console.log(
+			"Downloading base assets from index.html (links & scripts)",
+		);
+		await sleep(500);
+		const links = [
+			...Array.from(document.querySelectorAll("link")).map(
+				(link) => link.href,
+			),
+			...Array.from(document.querySelectorAll("script")).map(
+				(script) => script.src,
+			),
+		];
+		await fetchLinks(links, app);
+		console.log(
+			"Base assets have finished! A deep scan of these assets for asset chunks will now occur.",
+		);
+		await fetchLinks(getLinksFromCssFiles(app), app);
+		console.log("Finished downloading assets from CSS files.");
+		// console.log(getChunksFromJsFiles());
+		await fetchLinks(getLinksFromChunks(getChunksFromJsFiles(app)), app);
+		console.log("Finished downloading JS chunks.");
+		await fetchLinks(getLinksFromGeneralSearch(app), app);
+		console.log("Finding and replacing patterns...");
+		performFindAndReplace(config, app);
+		console.log("All done! Running the server.");
+		runNodeApp(app.name, app.port);
 	}
-	const doc = new JSDOM(
-		await (await fetch("https://discord.com/login")).text(),
-	);
-	const document = doc.window.document;
-	await generateDiscordHtml(doc);
-	console.log(
-		"Generated Discord HTML based off config.json at ./discord/index.html. The assets will be downloaded next.",
-	);
-	if (!fs.existsSync("./discord/assets")) fs.mkdirSync("./discord/assets");
-	await sleep(2000);
-	console.log("Downloading base assets from index.html (links & scripts)");
-	await sleep(500);
-	const links = [
-		...Array.from(document.querySelectorAll("link")).map(
-			(link) => link.href,
-		),
-		...Array.from(document.querySelectorAll("script")).map(
-			(script) => script.src,
-		),
-	];
-	await fetchLinks(links);
-	console.log(
-		"Base assets have finished! A deep scan of these assets for asset chunks will now occur.",
-	);
-	await fetchLinks(getLinksFromCssFiles());
-	console.log("Finished downloading assets from CSS files.");
-	// console.log(getChunksFromJsFiles());
-	await fetchLinks(getLinksFromChunks(getChunksFromJsFiles()));
-	console.log("Finished downloading JS chunks.");
-	await fetchLinks(getLinksFromGeneralSearch());
-	console.log("Finding and replacing patterns...");
-	performFindAndReplace(config);
-	console.log("All done! Running the server.");
-	const exitCode = await runNodeApp("discord");
-	process.exit(exitCode || 0);
 })();
