@@ -1,5 +1,6 @@
 import fs from "fs";
 import { isMoreThan80PercentIdentical, isOfChunkType } from "./typeChecks";
+import { Config } from "../types/env";
 
 export function getChunksFromJsFiles() {
 	let result: { [key: number]: string } | undefined;
@@ -71,4 +72,62 @@ export function getLinksFromGeneralSearch() {
 			result.push(...urlContents);
 		});
 	return result;
+}
+
+function replaceInQuotes(
+	inputString: string,
+	searchString: string,
+	replaceString: string,
+	type: "exact" | "loose",
+) {
+	const result = inputString.replace(
+		/(['"`])(.*?[^\\])\1/g,
+		(match, quote, inside) => {
+			if (type === "exact") {
+				if (inside.trim() === searchString) {
+					return `${quote}${replaceString}${quote}`;
+				} else {
+					return match;
+				}
+			} else {
+				return `${quote}${inside.replace(
+					new RegExp(searchString, "g"),
+					replaceString,
+				)}${quote}`;
+			}
+		},
+	);
+	return result;
+}
+
+export function performFindAndReplace(config: Config) {
+	const assets = fs.readdirSync("discord/assets");
+	assets
+		.filter((f) => f.endsWith(".serve"))
+		.forEach((f) => {
+			fs.rmSync(`discord/assets/${f}`);
+		});
+	assets
+		.filter((f) => f.endsWith(".js"))
+		.forEach((f) => {
+			let patternCount = 0;
+			const contents = fs.readFileSync(`discord/assets/${f}`).toString();
+			let newContents = contents;
+			config.patterns.forEach((p) => {
+				patternCount++;
+				newContents = replaceInQuotes(
+					newContents,
+					p.find,
+					p.replace,
+					p.type,
+				);
+			});
+			if (contents === newContents) return;
+			console.log(
+				`${patternCount} pattern${
+					patternCount !== 1 ? "s" : ""
+				} found in ${f}! Writing to discord/assets/${f}.serve...`,
+			);
+			fs.writeFileSync(`discord/assets/${f}.serve`, newContents);
+		});
 }

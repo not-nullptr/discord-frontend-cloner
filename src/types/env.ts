@@ -31,3 +31,14 @@ export interface SentryTags {
 	buildId: string;
 	buildType: string;
 }
+
+export interface Patterns {
+	find: string;
+	replace: string;
+	type: "loose" | "exact";
+}
+
+export interface Config {
+	GLOBAL_ENV: GlobalEnv;
+	patterns: Patterns[];
+}

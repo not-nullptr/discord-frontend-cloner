@@ -2,128 +2,124 @@
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"type": "object",
 	"properties": {
-		"API_ENDPOINT": {
-			"type": "string"
-		},
-		"API_VERSION": {
-			"type": "integer"
-		},
-		"GATEWAY_ENDPOINT": {
-			"type": "string",
-			"format": "uri"
-		},
-		"WEBAPP_ENDPOINT": {
-			"type": "string"
-		},
-		"CDN_HOST": {
-			"type": "string"
-		},
-		"ASSET_ENDPOINT": {
-			"type": "string"
-		},
-		"MEDIA_PROXY_ENDPOINT": {
-			"type": "string"
-		},
-		"WIDGET_ENDPOINT": {
-			"type": "string"
-		},
-		"INVITE_HOST": {
-			"type": "string"
-		},
-		"GUILD_TEMPLATE_HOST": {
-			"type": "string",
-			"format": "hostname"
-		},
-		"GIFT_CODE_HOST": {
-			"type": "string",
-			"format": "hostname"
-		},
-		"RELEASE_CHANNEL": {
-			"type": "string",
-			"enum": ["stable", "staging"]
-		},
-		"MARKETING_ENDPOINT": {
-			"type": "string"
-		},
-		"BRAINTREE_KEY": {
-			"type": "string"
-		},
-		"STRIPE_KEY": {
-			"type": "string"
-		},
-		"NETWORKING_ENDPOINT": {
-			"type": "string"
-		},
-		"RTC_LATENCY_ENDPOINT": {
-			"type": "string"
-		},
-		"ACTIVITY_APPLICATION_HOST": {
-			"type": "string",
-			"format": "hostname"
-		},
-		"PROJECT_ENV": {
-			"type": "string",
-			"enum": ["production", "development", "staging"]
-		},
-		"REMOTE_AUTH_ENDPOINT": {
-			"type": "string"
-		},
-		"SENTRY_TAGS": {
+		"GLOBAL_ENV": {
 			"type": "object",
 			"properties": {
-				"buildId": {
+				"API_ENDPOINT": {
 					"type": "string"
 				},
-				"buildType": {
+				"API_VERSION": {
+					"type": "integer"
+				},
+				"GATEWAY_ENDPOINT": {
+					"type": "string",
+					"format": "uri"
+				},
+				"WEBAPP_ENDPOINT": {
+					"type": "string"
+				},
+				"CDN_HOST": {
+					"type": "string"
+				},
+				"ASSET_ENDPOINT": {
+					"type": "string"
+				},
+				"MEDIA_PROXY_ENDPOINT": {
+					"type": "string"
+				},
+				"WIDGET_ENDPOINT": {
+					"type": "string"
+				},
+				"INVITE_HOST": {
+					"type": "string"
+				},
+				"GUILD_TEMPLATE_HOST": {
+					"type": "string",
+					"format": "hostname"
+				},
+				"GIFT_CODE_HOST": {
+					"type": "string",
+					"format": "hostname"
+				},
+				"RELEASE_CHANNEL": {
+					"type": "string",
+					"enum": ["stable", "staging"]
+				},
+				"MARKETING_ENDPOINT": {
+					"type": "string"
+				},
+				"BRAINTREE_KEY": {
+					"type": "string"
+				},
+				"STRIPE_KEY": {
+					"type": "string"
+				},
+				"NETWORKING_ENDPOINT": {
+					"type": "string"
+				},
+				"RTC_LATENCY_ENDPOINT": {
+					"type": "string"
+				},
+				"ACTIVITY_APPLICATION_HOST": {
+					"type": "string",
+					"format": "hostname"
+				},
+				"PROJECT_ENV": {
+					"type": "string",
+					"enum": ["production", "development", "staging"]
+				},
+				"REMOTE_AUTH_ENDPOINT": {
+					"type": "string"
+				},
+				"SENTRY_TAGS": {
+					"type": "object",
+					"properties": {
+						"buildId": {
+							"type": "string"
+						},
+						"buildType": {
+							"type": "string"
+						}
+					},
+					"required": ["buildId", "buildType"]
+				},
+				"MIGRATION_SOURCE_ORIGIN": {
+					"type": "string",
+					"format": "uri"
+				},
+				"MIGRATION_DESTINATION_ORIGIN": {
+					"type": "string",
+					"format": "uri"
+				},
+				"HTML_TIMESTAMP": {
+					"type": "integer"
+				},
+				"ALGOLIA_KEY": {
+					"type": "string"
+				},
+				"PUBLIC_PATH": {
 					"type": "string"
 				}
-			},
-			"required": ["buildId", "buildType"]
+			}
 		},
-		"MIGRATION_SOURCE_ORIGIN": {
-			"type": "string",
-			"format": "uri"
-		},
-		"MIGRATION_DESTINATION_ORIGIN": {
-			"type": "string",
-			"format": "uri"
-		},
-		"HTML_TIMESTAMP": {
-			"type": "integer"
-		},
-		"ALGOLIA_KEY": {
-			"type": "string"
-		},
-		"PUBLIC_PATH": {
-			"type": "string"
+		"patterns": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"find": {
+						"type": "string"
+					},
+					"replace": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string",
+						"enum": ["loose", "exact"]
+					}
+				},
+				"required": ["find", "replace"]
+			}
 		}
-	},
-	"required": [
-		"API_ENDPOINT",
-		"API_VERSION",
-		"GATEWAY_ENDPOINT",
-		"WEBAPP_ENDPOINT",
-		"CDN_HOST",
-		"ASSET_ENDPOINT",
-		"MEDIA_PROXY_ENDPOINT",
-		"WIDGET_ENDPOINT",
-		"INVITE_HOST",
-		"GUILD_TEMPLATE_HOST",
-		"GIFT_CODE_HOST",
-		"RELEASE_CHANNEL",
-		"MARKETING_ENDPOINT",
-		"BRAINTREE_KEY",
-		"STRIPE_KEY",
-		"NETWORKING_ENDPOINT",
-		"RTC_LATENCY_ENDPOINT",
-		"ACTIVITY_APPLICATION_HOST",
-		"PROJECT_ENV",
-		"REMOTE_AUTH_ENDPOINT",
-		"SENTRY_TAGS",
-		"MIGRATION_SOURCE_ORIGIN",
-		"MIGRATION_DESTINATION_ORIGIN",
-		"HTML_TIMESTAMP",
-		"ALGOLIA_KEY",
-		"PUBLIC_PATH"
-	]
+	}
 }
