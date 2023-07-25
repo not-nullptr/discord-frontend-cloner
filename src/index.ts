@@ -49,43 +49,43 @@ async function generateDiscordHtml(doc: JSDOM) {
 }
 
 (async () => {
-	// if (!fs.existsSync("discord")) {
-	// 	const git = simpleGit("");
-	// 	await git.clone(
-	// 		"https://github.com/not-nullptr/discord-selfhosting-guide",
-	// 		"discord",
-	// 	);
-	// }
-	// const doc = new JSDOM(
-	// 	await (await fetch("https://discord.com/login")).text(),
-	// );
-	// const document = doc.window.document;
-	// await generateDiscordHtml(doc);
-	// console.log(
-	// 	"Generated Discord HTML based off config.json at ./discord/index.html. The assets will be downloaded next.",
-	// );
-	// if (!fs.existsSync("./discord/assets")) fs.mkdirSync("./discord/assets");
-	// await sleep(2000);
-	// console.log("Downloading base assets from index.html (links & scripts)");
-	// await sleep(500);
-	// const links = [
-	// 	...Array.from(document.querySelectorAll("link")).map(
-	// 		(link) => link.href,
-	// 	),
-	// 	...Array.from(document.querySelectorAll("script")).map(
-	// 		(script) => script.src,
-	// 	),
-	// ];
-	// await fetchLinks(links);
-	// console.log(
-	// 	"Base assets have finished! A deep scan of these assets for asset chunks will now occur.",
-	// );
-	// await fetchLinks(getLinksFromCssFiles());
-	// console.log("Finished downloading assets from CSS files.");
-	// // console.log(getChunksFromJsFiles());
-	// await fetchLinks(getLinksFromChunks(getChunksFromJsFiles()));
-	// console.log("Finished downloading JS chunks.");
-	// await fetchLinks(getLinksFromGeneralSearch());
+	if (!fs.existsSync("discord")) {
+		const git = simpleGit("");
+		await git.clone(
+			"https://github.com/not-nullptr/discord-selfhosting-guide",
+			"discord",
+		);
+	}
+	const doc = new JSDOM(
+		await (await fetch("https://discord.com/login")).text(),
+	);
+	const document = doc.window.document;
+	await generateDiscordHtml(doc);
+	console.log(
+		"Generated Discord HTML based off config.json at ./discord/index.html. The assets will be downloaded next.",
+	);
+	if (!fs.existsSync("./discord/assets")) fs.mkdirSync("./discord/assets");
+	await sleep(2000);
+	console.log("Downloading base assets from index.html (links & scripts)");
+	await sleep(500);
+	const links = [
+		...Array.from(document.querySelectorAll("link")).map(
+			(link) => link.href,
+		),
+		...Array.from(document.querySelectorAll("script")).map(
+			(script) => script.src,
+		),
+	];
+	await fetchLinks(links);
+	console.log(
+		"Base assets have finished! A deep scan of these assets for asset chunks will now occur.",
+	);
+	await fetchLinks(getLinksFromCssFiles());
+	console.log("Finished downloading assets from CSS files.");
+	// console.log(getChunksFromJsFiles());
+	await fetchLinks(getLinksFromChunks(getChunksFromJsFiles()));
+	console.log("Finished downloading JS chunks.");
+	await fetchLinks(getLinksFromGeneralSearch());
 	console.log("Finding and replacing patterns...");
 	performFindAndReplace(config);
 	console.log("All done! Running the server.");
