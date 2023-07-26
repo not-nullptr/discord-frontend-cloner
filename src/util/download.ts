@@ -12,14 +12,18 @@ export function sleep(ms: number) {
 export function downloadBinaryAsset(path: string, app: App) {
 	let client = https;
 	return new Promise<void>((resolve, reject) => {
+		const downloadPath = `.${path}`;
+		if (!fs.existsSync(downloadPath.split("/").slice(0, -1).join("/"))) {
+			fs.mkdirSync(downloadPath.split("/").slice(0, -1).join("/"), {
+				recursive: true,
+			});
+		}
 		const req = client.get(`https://discord.com${path}`, (res) => {
-			res.pipe(fs.createWriteStream(`.${path}`))
+			res.pipe(fs.createWriteStream(downloadPath))
 				.on("error", reject)
 				.once("close", () => resolve());
 		});
-
 		req.on("error", (err) => {
-			// Handle the error here
 			reject(err);
 		});
 	});
@@ -40,9 +44,10 @@ export async function fetchLinks(
 	try {
 		for (const link of links) {
 			if (fs.existsSync(`./${link}`)) continue;
-			plaintext(link)
-				? await downloadPlaintextAsset(link, app)
-				: await downloadBinaryAsset(link, app);
+			// plaintext(link)
+			// 	? await downloadPlaintextAsset(link, app)
+			// 	: await downloadBinaryAsset(link, app);
+			await downloadBinaryAsset(link, app);
 			if (rateLimit) await sleep(150);
 			console.log(link);
 		}

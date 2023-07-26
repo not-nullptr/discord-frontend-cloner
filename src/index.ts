@@ -32,6 +32,11 @@ const apps: App[] = [
 		name: "devportal",
 		port: 3001,
 	},
+	{
+		url: "https://discord.com",
+		name: "home",
+		port: 3002,
+	},
 ];
 
 const config = JSON.parse(fs.readFileSync("config.json").toString()) as Config;
@@ -58,7 +63,7 @@ async function generateDiscordHtml(doc: JSDOM, app: App) {
 		.querySelectorAll("script")
 		.forEach((e) => e.removeAttribute("integrity"));
 	fs.writeFileSync(
-		`./${app.name}/index.html`,
+		`apps/${app.name}/index.html`,
 		await prettier.format(doc.serialize(), {
 			tabWidth: 2,
 			useTabs: true,
@@ -68,14 +73,16 @@ async function generateDiscordHtml(doc: JSDOM, app: App) {
 }
 
 (async () => {
+	if (!fs.existsSync("apps")) fs.mkdirSync("apps");
 	for (const app of apps) {
-		if (!fs.existsSync(app.name)) {
+		if (!fs.existsSync(`apps/${app.name}`)) {
 			const git = simpleGit("");
 			await git.clone(
 				"https://github.com/not-nullptr/discord-selfhosting-guide",
-				app.name,
+				`apps/${app.name}`,
 			);
 		}
+		await simpleGit(`apps/${app.name}`).pull();
 		const doc = new JSDOM(await (await fetch(app.url)).text());
 		const document = doc.window.document;
 		await generateDiscordHtml(doc, app);
@@ -89,12 +96,12 @@ async function generateDiscordHtml(doc: JSDOM, app: App) {
 		);
 		await sleep(500);
 		const links = [
-			...Array.from(document.querySelectorAll("link")).map(
-				(link) => link.href,
-			),
-			...Array.from(document.querySelectorAll("script")).map(
-				(script) => script.src,
-			),
+			...Array.from(document.querySelectorAll("link"))
+				.map((link) => link.href)
+				.filter((link) => link.startsWith("/assets/")),
+			...Array.from(document.querySelectorAll("script"))
+				.map((script) => script.src)
+				.filter((script) => script.startsWith("/assets/")),
 		];
 		await fetchLinks(links, app);
 		console.log(
@@ -109,6 +116,6 @@ async function generateDiscordHtml(doc: JSDOM, app: App) {
 		console.log("Finding and replacing patterns...");
 		performFindAndReplace(config, app);
 		console.log("All done! Running the server.");
-		runNodeApp(app.name, app.port);
+		runNodeApp(`apps/${app.name}`, app.port);
 	}
 })();

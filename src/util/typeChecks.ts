@@ -21,14 +21,13 @@ export function isMoreThan80PercentIdentical(arr: any[]): boolean {
 
 export function isOfChunkType(potentialChunks: Object) {
 	for (const key of Object.keys(potentialChunks)) {
-		if (isNaN(Number(key))) {
-			return false;
-		}
+		if (isNaN(Number(key))) return false;
 	}
 	for (const value of Object.values(potentialChunks)) {
-		if (typeof value !== "string") {
-			return false;
-		}
+		if (typeof value !== "string") return false;
+		const name = value.replace("/assets/", "").replace(".js", "");
+		// /assets/fae42285c54c50824e97.js
+		if (!/^[0-9A-Fa-f]+$/.test(name) || name.length <= 1) return false;
 	}
 	return true;
 }
